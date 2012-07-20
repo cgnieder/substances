@@ -1,0 +1,357 @@
+% arara: pdflatex: { shell: on }
+% arara: pdflatex
+\documentclass[DIV10,toc=index,toc=bib]{cnpkgdoc}
+\docsetup{
+  pkg = {[index]substances} ,
+  code-box = {
+    backgroundcolor  = gray!7!white ,
+    skipbelow        = .6\baselineskip plus .5ex minus .5ex ,
+    skipabove        = .6\baselineskip plus .5ex minus .5ex ,
+    roundcorner      = 3pt ,
+  } ,
+  gobble   = 0
+}
+\LoadSubstances{substances-examples}
+\addcmds{
+  @EC,
+  ac,
+  bottomrule,
+  celsius,
+  ch,
+  chem,
+  chemfig,
+  chemsetup,
+  cmc,
+  DeclareSubstance,
+  DeclareSubstanceProperty,
+  EC,
+  GetSubstanceProperty,
+  gram,
+  iupac,
+  LoadSubstances,
+  midrule,
+  MolMass,
+  num,
+  per,
+  SI,
+  sisetup,
+  toprule
+}
+
+% Layout:
+\usepackage[osf]{libertine}
+\cnpkgcolors{
+  main   => cnpkgred ,
+  key    => yellow!40!brown ,
+  module => cnpkgblue ,
+  link   => black!90
+}
+\usepackage{booktabs}
+\renewcommand*\othersectionlevelsformat[3]{%
+  \textcolor{main}{#3\autodot}\enskip}
+\renewcommand*\partformat{%
+  \textcolor{main}{\partname~\thepart\autodot}}
+\usepackage{fnpct}
+\usepackage[biblatex]{embrac}[2012/06/29]
+\ChangeEmph{[}[,.02em]{]}[.055em,-.08em]
+\ChangeEmph{(}[-.01em,.04em]{)}[.04em,-.05em]
+
+\usepackage{acro}
+\DeclareAcronym{CAS}{CAS,}{Chemical Abstract Service,}
+\DeclareAcronym{EC}{EC}{European Commission Number}
+\DeclareAcronym{LD50}{LD50,}{Median Lethal Dose}
+\DeclareAcronym{IUPAC}{IUPAC,}{International Union of Pure and Applied Chemistry,}
+\DeclareAcronym{ghs}{GHS,}{Globally Harmonized System of Classification and
+  Labelling of Chemicals,}
+
+% bibliography:
+\usepackage[style=alphabetic,backend=biber]{biblatex}
+
+% index:
+\usepackage{imakeidx,filecontents}
+\begin{filecontents*}{\jobname.ist}
+ heading_prefix "{\\bfseries "
+ heading_suffix "\\hfil}\\nopagebreak\n"
+ headings_flag  1
+ delim_0 "\\dotfill "
+ delim_1 "\\dotfill "
+ delim_2 "\\dotfill "
+ delim_r "\\textendash"
+ suffix_2p "\\nohyperpage{\\,f.}"
+ suffix_3p "\\nohyperpage{\\,ff.}"
+\end{filecontents*}
+
+% \indexsetup{noclearpage}
+\makeindex[options=-sl \jobname.ist,intoc]
+\makeindex[name=\jobname-chem,title=Chemicals,intoc,columns=3]
+
+% abstract:
+\TitlePicture{\parbox{.7\linewidth}{%
+  The \substances package allows you to create a database like file that contains
+  data of various chemicals. These data can be retrieved in the document. An index
+  creation of the chemicals used in the document is directly supported.}}
+
+\ExplSyntaxOn
+\NewDocumentCommand \Default {g}
+  {
+    \hfill\llap
+      {
+        \IfNoValueTF { #1 }
+          {(initially~empty)}
+          {Default:~\code{#1}}
+      }
+    \newline
+  }
+\NewDocumentCommand \required {}
+  { \hfill \llap { required } \newline }
+\NewDocumentCommand \optional {}
+  { \hfill \llap { optional } \newline }
+\ExplSyntaxOff
+\begin{document}
+
+\section{Licence and Requirements}
+Permission is granted to copy, distribute and/or modify this software under the
+terms of the \LaTeX{} Project Public License, version 1.3 or later
+(\url{http://www.latex-project.org/lppl.txt}). The package has the status
+``maintained.''
+
+\substances loads and needs the following packages: \paket{expl3},
+\paket{xparse}, \paket{xtemplate} and \paket{l3keys2e}. It also needs the
+chemistry package \paket{chemmacros}.
+
+\section{About}
+The \substances package allows you to create a database like file that contains
+data of various chemicals. These data can be retrieved in the document. An index
+creation of the chemicals used in the document is directly supported.
+
+\section{Options}
+\substances has only a few options:
+\begin{beschreibung}
+ \Option{draft}{\default{true}|false}\Default{false}
+   If set to true all warnings will be errors.
+ \Option{final}{\default{true}|false}\Default{true}
+   The opposite of \key{draft}.
+ \Option{index}{\default{true}|false}\Default{false}
+   Add index entries when \cmd{chem} is called, see section~\ref{sec:index}.
+ \Option{style}{<style>}\Default{default}
+   Load specific style, see section~\ref{ssec:styles}.
+ \Option{strict}{\default{true}|false}\Default{false}
+   If set to true all warnings will be errors. This option overwrites any
+   \key{draft} or \key{final} option that is passed on by the document class.
+\end{beschreibung}
+
+\section{The Database}
+\subsection{Declaring the Chemicals}
+The data about substances are stored via the command
+\begin{beschreibung}
+ \Befehl{DeclareSubstance}{<id>}\ma{<list of properties>}
+\end{beschreibung}
+An entry could look like this:
+\begin{beispiel}[code only]
+\DeclareSubstance{NaCl}{
+  name    = Sodiumchloride ,
+  sum     = NaCl ,
+  CAS     = 7647-14-5,
+  mass    = 58.44 ,
+  mp      = 801 ,
+  bp      = 1465 ,
+  phase   = solid ,
+  density = 2.17
+}
+\end{beispiel}
+
+Such entries can either be declared in the document preamble or probably
+more useful in a file with the ending \code{.sub}. Such a file can be input in
+the document via
+\begin{beschreibung}
+ \befehl{LoadSubstances}{<filename>} input the file \emph{without} specifying
+   the file ending.
+\end{beschreibung}
+Suppose you have the file \code{mysubstances.sub} then you input it in the
+document preamble via \cmd{LoadSubstances}{mysubstances}.
+
+\subsection{Available Fields}
+\subsubsection{Always Defined Fields}
+Below all fields defined by \substances are listed\footnote{Look in the file
+\code{substances-examples.sub} which is part of this package and
+should be in the same place as this documentation for example uses.}.
+\begin{beschreibung}
+ \Option{name}\required The \acs{IUPAC} name of the substance. This is the only
+   field that \emph{has} to be used. The field's input is parsed with
+   \paket{chemmacros}' command \cmd{iupac}.
+ \Option{alt}\optional An alternative name. The field's input is parsed with
+   \paket{chemmacros}' command \cmd{iupac}.
+ \Option{CAS}\optional The \ac{CAS} number. The input needs to be input in the
+   form \code{<num>-<num>-<num>}.
+ \Option{PubChem}\optional The PubChem number.
+\end{beschreibung}
+
+\subsubsection{Style-dependend Fields}
+\substances defines the style `default' which is loaded if no other style has
+been specified. It defines the following additional fields and loads the
+packages \paket{chemfig} and \paket{siunitx}.
+\begin{beschreibung}
+ \Option{formula}\optional The molecular formula of the substance. The field's
+   input is parsed with \paket{chemmacros}' command
+   \cmd{ch}.
+ \Option{structure}\optional The structural formula of the substance. The field's
+   input is parsed with \paket{chemfig}'s command \cmd{chemfig}.
+ \Option{mp}\optional The boiling point. The field's entry is input into
+   the \paket{siunitx} command \cmd{SI} in the following way:
+   \cmd{SI}{<field>}\ma{\cmd{celsius}}.
+ \Option{bp}\optional The melting point. The field's entry is input into
+   the \paket{siunitx} command \cmd{SI} in the following way:
+   \cmd{SI}{<field>}\ma{\cmd{celsius}}.
+ \Option{density}\optional The density. The field's entry is input into
+   the \paket{siunitx} command \cmd{SI} in the following way:
+   \cmd{SI}{<field>}\ma{\cmd{gram}\cmd{per}\cmd{cmc}}.
+ \Option{phase}\optional The state of aggregation.
+ \Option{pKa}\optional The \pKa\ value. The field's entry is input into the
+   \paket{siunitx} command \cmd{num}.
+ \Option{pKa1}\optional The first of several \pKa\ values. The field's entry is
+   input into the \paket{siunitx} command \cmd{num}.
+ \Option{pKa2}\optional The second of several \pKa\ values. The field's entry is
+   input into the \paket{siunitx} command \cmd{num}.
+ \Option{pKb}\optional The \pKb\ values. The field's entry is input into the
+   \paket{siunitx} command \cmd{num}.
+ \Option{pKb1}\optional The first of several \pKb\ values. The field's entry is
+   input into the \paket{siunitx} command \cmd{num}.
+ \Option{pKb2}\optional The second of several \pKb\ values. The field's entry is
+   input into the \paket{siunitx} command \cmd{num}.
+ \Option{pictograms}\optional The GHS pictograms. This field takes a list
+   of pictogram names as they're input into \paket{chemmacros}' command
+   \cmd{ghspic}.
+ \Option{H}\optional The H statements. This field takes a list
+   of numbers as they're input into \paket{chemmacros}' command
+   \cmd{ghs}{h}\ma{<number>}.
+ \Option{P}\optional The P statements. This field takes a list
+   of pictogram names as they're input into \paket{chemmacros}' command
+   \cmd{ghs}{p}\ma{<number>}.
+ \Option{EUH}\optional The EUH statements. This field takes a list
+   of pictogram names as they're input into \paket{chemmacros}' command
+   \cmd{ghs}{h}\ma{<number>}.
+ \Option{LD50}\optional The \ac{LD50} in \si{\milli\gram\per\kilo\gram}. The
+   field's entry is input into the \paket{siunitx} command \cmd{SI} in the
+   following way: \cmd{SI}{<field>}\ma{\cmd{milli}\cmd{gram}\cmd{per}\cmd{kilo}\cmd{gram}}.
+\end{beschreibung}
+
+\subsection{Define Custom Styles}\label{ssec:styles}
+\subsubsection{Background}
+You might have other needs for fields than the ones defined by \substances and
+the `default' style. You can easily define your own style which means that you
+save a file with the name \code{substances\_<style>.def}. In it you save the
+commands you need and use the command \cmd{DeclareSubstanceProperty}, which is
+explained in the next section, to declare your own fields.
+
+Please beware that this style file is loaded by the package when the \code{expl3}
+namespace is active. This means that all spaces are ignored and you need to use
+\code{\textasciitilde} if you need a space. It also means that \code{\_} and
+\code{:} are letters (as is \code{{\makeatletter @}}). Should you ever decide to
+call \cmd{ExplSyntaxOff} to turn off the \code{expl3} namespace \emph{don't} forget
+to use \cmd{ExplSyntaxOn} at the end of the file!
+
+\subsubsection{Declare New Fields or Change Existing Fields}
+You might want other fields or change the definition of the predefined ones.
+For this there's
+\begin{beschreibung}
+ \Befehl{DeclareSubstanceProperty}*{<field name>}\oa{<pre code>}\oa{<post code>}
+\end{beschreibung}
+This command declares a new property field for a substance. The star makes the
+property a required one which means an error will be issued if a substance is
+declared without it. The optional arguments \code{<pre code>} and \code{<post code>}
+specify any code that should be input directly before or after the field entry,
+respectively. The \code{<pre code>} may end with a command that takes one mandatory
+argument. In this case the field entry will be its argument.
+
+The following example would define a field \key{EC} which uses a custom command
+to parse the field entry. The \ac{EC} is assigned to chemical substances
+for regulatory purposes within the European Union by the regulatory authorities.
+\begin{beispiel}[code only]
+ \makeatletter
+ \def\@EC#1-#2-#3{#1-#2-#3}
+ \newcommand*\EC[1]{\@EC#1}
+ \makeatother
+ \DeclareSubstanceProperty{EC}[\EC]
+\end{beispiel}
+For further examples of the usage of pre and post code look at the definition of
+the \key{name} and the \key{mp} field:
+\begin{beispiel}[code only]
+ \DeclareSubstanceProperty*{name}[\iupac]
+ \DeclareSubstanceProperty{mp}[\SI][{\celsius}]
+\end{beispiel}
+
+
+\section{Retrieving the Data}
+There are two commands defined by \substances that allow the retrieving of the
+data. The command \cmd{chem} is intended as user command, the command
+\cmd{GetSubstanceProperty} can be used to define your own user command (perhaps
+in your own style file, see section~\ref{ssec:styles}).
+\begin{beschreibung}
+ \Befehl{chem}*[<pre>]\oa{<post>}\ma{<id>}\oa{<property>}
+ \Befehl{GetSubstanceProperty}{<id>}\ma{<property>}
+\end{beschreibung}
+If the command \cmd{chem} is called without the \oa{<property>} argument the
+\code{name} entry will be called. The starred version calls the \code{alt} entry
+if it is defined and the \code{name} entry otherwise. The arguments \oa{<pre>}
+and \oa{<post>} add arbitrary input before or after the output, respectively.
+
+All of the next examples use the data defined in the file \code{substances-examples.sub}
+that is part of this package, see section~\ref{sec:examples}.
+\begin{beispiel}
+ \chem{H2SO4}[structure] \newline
+ \chem{H2SO4} has the boiling point \(\chem[T_b =]{H2SO4}[bp]\) and a
+ density of \(\chem[\rho =]{H2SO4}[density]\).
+
+ Compare the melting points of methane and ethane,
+ \(\chem[T_m=]{methane}[mp]\) and \(\chem[T_m=]{ethane}[mp]\),
+ with the boiling points \(\chem[T_b=]{methane}[bp]\) and
+ \(\chem[T_b=]{ethane}[bp]\).
+ 
+ \chem{NaCl} has the \ac{CAS} number \chem{NaCl}[CAS].
+ 
+ \chem{acetone} (\chem*{acetone}) is the most simple ketone:
+ 
+ \chem{acetone}[structure]
+\end{beispiel}
+
+The following code creates table~\ref{tab:methane}.
+\begin{beispiel}[code and float]
+\begin{table}[htp]
+\centering\chemsetup[ghsystem]{hide}
+\sisetup{scientific-notation=fixed,fixed-exponent=0,per-mode=symbol}
+\begin{tabular}{l>{\raggedright\arraybackslash}p{.6\linewidth}}
+ \toprule
+  name              & \chem{methane} \\
+  formula           & \chem{methane}[formula] \\
+                    & \chem{methane}[structure] \\
+ \midrule
+  CAS               & \chem{methane}[CAS] \\
+  PubChem           & \chem{methane}[PubChem] \\
+ \midrule
+  boiling point     & \chem{methane}[bp] \\
+  melting point     & \chem{methane}[mp] \\
+  density           & \chem{methane}[density] \\
+  molar mass        & \chem{methane}[mass] \\
+ \midrule
+                    & \chem{methane}[pictograms] \\
+  H statements      & \chem{methane}[H] \\
+  P statements      & \chem{methane}[P] \\
+ \bottomrule
+\end{tabular}
+\caption{\label{tab:methane}All properties of \chem{methane} that have been
+saved in the example database.}
+\end{table}
+\end{beispiel}
+
+\section{Create an Index}\label{sec:index}
+% TODO
+
+\section{The Example Database}\label{sec:examples}
+The following code shows the example database that is part of this package.
+
+\lstinputlisting[basicstyle=\ttfamily\footnotesize]{substances-examples.sub}
+
+\appendix
+\printindex[\jobname-chem]
+\printindex
+\end{document}

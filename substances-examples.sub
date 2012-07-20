@@ -1,0 +1,133 @@
+% ----------------------------------------------------------------------------
+% substances-examples.sub
+% example database to the package `substances'
+%
+% Clemens Niederberger
+% 2012/07/19
+%
+\DeclareSubstance{NaCl}{
+  name    = Sodiumchloride ,
+  formula = NaCl ,
+  CAS     = 7647-14-5,
+  mass    = 58.44 ,
+  mp      = 801 ,
+  bp      = 1465 ,
+  phase   = solid ,
+  density = 2.17
+}
+
+\DeclareSubstance{HCl}{
+  name       = Hydrochloric Acid ,
+  formula    = HCl ,
+}
+
+\DeclareSubstance{HNO3}{
+  name       = Nitric Acid ,
+  formula    = HNO3 ,
+}
+
+\DeclareSubstance{H2SO4}{
+  name       = Sulfuric Acid ,
+  formula    = H2SO4 ,
+  structure  = {H-[:30]\Lewis{26,O}-S(=[2]\Lewis{13,O})(=[6]\Lewis{57,O})-\Lewis{26,O}-[:-30]H} ,
+  CAS        = 7664-93-9 ,
+  PubChem    = 1118 ,
+  mass       = 98.08 ,
+  density    = 1.8356 ,
+  mp         = 10.38 ,
+  bp         = 279.6 ,
+  phase      = liquid ,
+  pKa        = -3.0 ,
+  pKa1       = -3.0 ,
+  pKa2       = 1.9 ,
+  pictograms = acid ,
+  H          = 314 ,
+  P          = {280,301+330+331,309,310,305+351+338} ,
+  LD50       = 510
+}
+
+\DeclareSubstance{methane}{
+  name       = Methane ,
+  formula    = CH4 ,
+  structure  = H-C(-[2]H)(-[6]H)-H ,
+  CAS        = 74-82-8 ,
+  PubChem    = 297 ,
+  pictograms = {flame,bottle} ,
+  H          = 220 ,
+  P          = {210,377,381,410+403} ,
+  mass       = 16.04 ,
+  density    = 0.72e-3 ,
+  mp         = -182 ,
+  bp         = -162 ,
+  phase      = gaseous
+}
+
+\DeclareSubstance{ethane}{
+  name       = Ethane ,
+  formula    = C2H6 ,
+  structure  = H-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-H ,
+  CAS        = 74-84-0 ,
+  PubChem    = 6324 ,
+  pictograms = {flame,bottle} ,
+  H          = 220 ,
+  P          = {210,377,381,403} ,
+  mass       = 30.07 ,
+  density    = 0.72e-3 ,
+  mp         = -183 ,
+  bp         = -89 ,
+  phase      = gaseous
+}
+
+\DeclareSubstance{propane}{
+  name       = Propane ,
+  formula    = C3H8 ,
+}
+
+\DeclareSubstance{butane}{
+  name       = Butane ,
+  formula    = C4H10 ,
+}
+
+\DeclareSubstance{pentane}{
+  name       = Pentane ,
+  formula    = C5H12 ,
+}
+
+\DeclareSubstance{hexane}{
+  name       = Hexane ,
+  formula    = C6H14 ,
+}
+
+\DeclareSubstance{heptane}{
+  name       = Heptane ,
+  formula    = C7H16 ,
+}
+
+\DeclareSubstance{octane}{
+  name       = Octane ,
+  formula    = C8H18 ,
+}
+
+\DeclareSubstance{nonane}{
+  name       = Nonane ,
+  formula    = C9H20 ,
+}
+
+\DeclareSubstance{decane}{
+  name       = Decane ,
+  formula    = C10H22 ,
+}
+
+\DeclareSubstance{acetone}{
+  name      = Propan\-2\-one ,
+  alt       = Acetone ,
+  formula   = C3H6O ,
+  structure = {-[:30](=[2]\Lewis{13,O})-[:-30]} ,
+  CAS       = 67-64-1 ,
+  PubChem   = 180 ,
+  mass      = 58.08 ,
+  density   = 0.79 ,
+  mp        = -95 ,
+  bp        = 56 ,
+  LD50      = 5800
+}

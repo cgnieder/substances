@@ -224,9 +224,9 @@
       {
         \IfSubstancePropertyTF { #1 } { #2 }
           { \prop_get:cn { l_substances_#2_prop } { #1 } }
-          { {\bfseries??} \substances_msg:nnn { property-missing } { #1 } { #2 } }
+          { {??} \substances_msg:nnn { property-missing } { #1 } { #2 } }
       }
-      { {\bfseries??} \substances_msg:nnn { field-missing } { #1 } { #2 } }
+      { {??} \substances_msg:nnn { field-missing } { #1 } { #2 } }
   }
 
 % ----------------------------------------------------------------------------

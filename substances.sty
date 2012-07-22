@@ -77,22 +77,29 @@
 \msg_new:nnnn { substances } { property-missing }
   { Property~`#2'~not~defined~for~substance~`#1'~\msg_line_context:. }
   {
-    You~called~property~`#2'~for~substance~`#1'~\mgs_line_context:.~It~seems~
-    though~that~you~haven't~defined~it,~yet.
+    You~called~property~`#2'~for~substance~`#1'.~It~seems~though~that~you~
+    haven't~defined~it,~yet.
+  }
+
+\msg_new:nnnn { substances } { field-missing }
+  { Property~`#2'~is~not~defined~\msg_line_context:. }
+  {
+    You~called~property~`#2'~for~substance~`#1'.~This~property~has~not~been~
+    declared,~though.~Perhaps~you've~mispelled?
   }
 
 \msg_new:nnnn { substances } { dadabase-missing }
   { I~can't~find~the~database~file~`#1'~\msg_line_context:. }
   {
-    You~requested~the~database~file~`#1'~\msg_line_context:,~but~apparently~
-    it~is~missing.~Maybe~you've~mispelled?
+    You~requested~the~database~file~`#1',~but~apparently~it~is~missing.~Maybe~
+    you've~mispelled?
   }
 
 \msg_new:nnnn { substances } { required-field }
   { The~field~`#1'~is~missing~for~substance~`#2'~\msg_line_context:. }
   {
-    You~declared~the~the~substance~#2~\msg_line_context:,~but~forgot~
-    to~add~the~required~property~#1.
+    You~declared~the~the~substance~`#2'~but~forgot~to~add~the~required~
+    property~`#1'.
   }
 
 \msg_new:nnnn { substances } { style-missing }
@@ -213,12 +220,13 @@
 % recover values:
 \cs_new:Npn \substances_get_property:nn #1#2
   {
-    \prop_if_in:cnTF { l_substances_#2_prop } { #1 }
-      { \prop_get:cn { l_substances_#2_prop } { #1 } }
+    \IfSubstanceFieldTF { #2 }
       {
-        \textbf{??}
-        \substances_msg:nnn { property-missing } { #1 } { #2 }
+        \IfSubstancePropertyTF { #1 } { #2 }
+          { \prop_get:cn { l_substances_#2_prop } { #1 } }
+          { {\bfseries??} \substances_msg:nnn { property-missing } { #1 } { #2 } }
       }
+      { {\bfseries??} \substances_msg:nnn { field-missing } { #1 } { #2 } }
   }
 
 % ----------------------------------------------------------------------------
@@ -286,8 +294,12 @@
     \IfNoValueTF { #5 }
       {
         \IfBooleanTF { #1 }
-          { \substances_get_property:nn { #4 } { alt } }
-          { \substances_get_property:nn { #4 } { name } }
+          {
+            \IfSubstancePropertyTF { #4 } { alt }
+              { \RetrieveSubstanceProperty { #4 } { alt } }
+              { \RetrieveSubstanceProperty { #4 } { name } }
+          }
+          { \RetrieveSubstanceProperty { #4 } { name } }
       }
       { \substances_get_property:nn { #4 } { #5 } }
     \IfNoValueF { #3 } { #3 }

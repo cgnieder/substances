@@ -1,5 +1,36 @@
 % arara: pdflatex: { shell: on }
-% arara: pdflatex
+% arara: pdflatex: { shell: on }
+% --------------------------------------------------------------------------
+% the SUBSTANCES package
+% 
+%   A Chemical Database
+% 
+% --------------------------------------------------------------------------
+% Clemens Niederberger
+% Web:    https://bitbucket.org/cgnieder/substances/
+% E-Mail: contact@mychemistry.eu
+% --------------------------------------------------------------------------
+% Copyright 2012 Clemens Niederberger
+% 
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+% 
+% This work has the LPPL maintenance status `maintained'.
+% 
+% The Current Maintainer of this work is Clemens Niederberger.
+% --------------------------------------------------------------------------
+% The substances package consists of the files
+%  - substances.sty, substances-default.def, substances-examples.sub,
+%    substances_en.tex, substances_en.pdf, README
+% --------------------------------------------------------------------------
+% If you have any ideas, questions, suggestions or bugs to report, please
+% feel free to contact me.
+% --------------------------------------------------------------------------
 \documentclass[DIV10,toc=index,toc=bib]{cnpkgdoc}
 \docsetup{
   pkg = {[index]substances} ,
@@ -13,28 +44,53 @@
 }
 \LoadSubstances{substances-examples}
 \addcmds{
+  @CAS,
   @EC,
   ac,
+  AllSubstancesClist,
+  AllSubstancesSequence,
   bottomrule,
+  CAS,
   celsius,
   ch,
   chem,
   chemfig,
   chemsetup,
   cmc,
+  DeclareChemIUPAC,
   DeclareSubstance,
   DeclareSubstanceProperty,
   EC,
+  endinput,
+  ForAllSubstancesDo,
   GetSubstanceProperty,
   gram,
+  IfSubstanceExistF,
+  IfSubstanceExistT,
+  IfSubstanceExistTF,
+  IfSubstanceFieldF,
+  IfSubstanceFieldT,
+  IfSubstanceFieldTF,
+  IfSubstancePropertyF,
+  IfSubstancePropertyT,
+  IfSubstancePropertyTF,
   iupac,
+  Lewis,
   LoadSubstances,
   midrule,
   MolMass,
+  NewDocumentCommand,
+  newindex,
+  normal,
   num,
   per,
+  printindex,
+  RetrieveSubstanceProperty,
   SI,
   sisetup,
+  SubstanceIndexAltEntry,
+  SubstanceIndexNameAltEntry,
+  SubstanceIndexNameEntry,
   toprule
 }
 
@@ -82,8 +138,8 @@
 \end{filecontents*}
 
 % \indexsetup{noclearpage}
-\makeindex[options=-sl \jobname.ist,intoc]
-\makeindex[name=\jobname-chem,title=Chemicals,intoc,columns=3]
+\makeindex[options=-sl \jobname.ist,intoc,title=Package Index]
+\makeindex[name=\jobname-chem,title=Index of Chemicals,intoc,columns=3]
 
 % abstract:
 \TitlePicture{\parbox{.7\linewidth}{%
@@ -179,12 +235,25 @@ should be in the same place as this documentation for example uses.}.
  \Option{name}\required The \acs{IUPAC} name of the substance. This is the only
    field that \emph{has} to be used. The field's input is parsed with
    \paket{chemmacros}' command \cmd{iupac}.
+ \Option{sort}\optional If you plan to use the \key{index} option you
+   should specify this field to get the sorting of the index right. This then
+   creates index entries \cmd{index}{<sort field>\@<name field>}.
  \Option{alt}\optional An alternative name. The field's input is parsed with
    \paket{chemmacros}' command \cmd{iupac}.
+ \Option{altsort}\optional This is the same as the \key{sort} field but for the
+   alternative name.
  \Option{CAS}\optional The \ac{CAS} number. The input needs to be input in the
    form \code{<num>-<num>-<num>}.
  \Option{PubChem}\optional The PubChem number.
 \end{beschreibung}
+
+The \key{CAS} field processes the number using the macro \cmd{CAS}{<number>}
+which is defined like this:
+\begin{beispiel}[code only]
+ \def\@CAS#1-#2-#3{\iupac{#1\-#2\-#3}}
+ \NewDocumentCommand\CAS{m}{\@CAS#1}
+\end{beispiel}
+You're free to redefine it to your needs.
 
 \subsubsection{Style-dependend Fields}
 \substances defines the style `default' which is loaded if no other style has
@@ -239,7 +308,7 @@ packages \paket{chemfig} and \paket{siunitx}.
 \subsubsection{Background}
 You might have other needs for fields than the ones defined by \substances and
 the `default' style. You can easily define your own style which means that you
-save a file with the name \code{substances\_<style>.def}. In it you save the
+save a file with the name \code{substances-<style>.def}. In it you save the
 commands you need and use the command \cmd{DeclareSubstanceProperty}, which is
 explained in the next section, to declare your own fields.
 
@@ -343,11 +412,182 @@ saved in the example database.}
 \end{table}
 \end{beispiel}
 
+\section{Additional Commands}
+\substances provides a few commands that maybe are useful in building custom
+macros for styles. A field exists if it has been defined with
+\cmd{DeclareSubstanceProperty} regardless if it has been used or not. A substance
+exists if it has been defined with \cmd{DeclareSubstance}.
+\begin{beschreibung}
+ \Befehl{GetSubstanceProperty}{<id>}\ma{<field>} \cnpkgdocarrow\ You know that
+   already: retrieve the property specified in \code{<field>} for a given substance.
+   This command is \emph{not} expandable.
+ \Befehl{RetrieveSubstanceProperty}{<id>}\ma{<field>} \cnpkgdocarrow\ Same as
+   \cmd{GetSubstanceProperty} but expandable.
+ \befehl{ForAllSubstancesDo}{<code>} Loops through all existing substances.
+   Inside \code{<code>} \code{\#1} may be used to refer to the \code{<id>} of the
+   current substance. This command is expandable.
+ \befehl{AllSubstancesSequence} A sequence of all substances. This is a sequence
+   of balanced groups each containing the \code{<id>} of a substance. This command
+   is expandable.
+ \befehl{AllSubstancesClist} A comma separated list of all substances. Every
+   \code{<id>} is separated from the next with a comma. This command is expandable.
+ \Befehl{IfSubstancePropertyTF}{<id>}\ma{<field>}\ma{<true code>}\ma{<false code>}
+   \cnpkgdocarrow\ Tests if the property \code{<field>} is defined for the
+   substance \code{<id>} and returns either \code{<true code>} or \code{<false code>}.
+   This command is expandable.
+ \Befehl{IfSubstancePropertyT}{<id>}\ma{<field>}\ma{<true code>} \cnpkgdocarrow\
+   Tests if the property \code{<field>} is defined for the substance \code{<id>}
+   and returns \code{<true code>} if it is. This command is expandable.
+ \Befehl{IfSubstancePropertyF}{<id>}\ma{<field>}\ma{<false code>} \cnpkgdocarrow\
+   Tests if the property \code{<field>} is defined for the substance \code{<id>}
+   and returns \code{<false code>} if it isn't. This command is expandable.
+ \Befehl{IfSubstanceFieldTF}{<field>}\ma{<true code>}\ma{<false code>}
+   \cnpkgdocarrow\ Tests if the property \code{<field>} exists and returns either
+   \code{<true code>} or \code{<false code>}. This command is expandable.
+ \Befehl{IfSubstanceFieldT}{<field>}\ma{<true code>} \cnpkgdocarrow\
+   Tests if the property \code{<field>} exists and returns \code{<true code>} if
+   it does. This command is expandable.
+ \Befehl{IfSubstanceFieldF}{<field>}\ma{<false code>} \cnpkgdocarrow\
+   Tests if the property \code{<field>} exists and returns \code{<false code>} if
+   it doesn't. This command is expandable.
+ \Befehl{IfSubstanceExistTF}{<id>}\ma{<true code>}\ma{<false code>}
+   \cnpkgdocarrow\ Tests if the property \code{<field>} exists and returns either
+   \code{<true code>} or \code{<false code>}. This command is expandable.
+ \Befehl{IfSubstanceExistT}{<id>}\ma{<true code>} \cnpkgdocarrow\
+   Tests if the substance \code{<id>} exists and returns \code{<true code>} if
+   it does. This command is expandable.
+ \Befehl{IfSubstanceExistF}{<id>}\ma{<false code>} \cnpkgdocarrow\
+   Tests if the substance \code{<id>} exists and returns \code{<false code>} if
+   it doesn't. This command is expandable.
+\end{beschreibung}
+
+\begin{beispiel}
+Just to demonstrate how these commands can be used:\par
+\newcounter{substances}
+\ForAllSubstancesDo{%
+  \ifnum0=\value{substances}\relax
+  \else, \fi
+  \stepcounter{substances}%
+  \chem{#1}%
+  \IfSubstancePropertyT{#1}{alt}{
+    (\chem*{#1})}}
+\end{beispiel}
+
 \section{Create an Index}\label{sec:index}
-% TODO
+When \substances is called with \key{index}{true} the command \cmd{chem} will
+add index entries each time it is used. In this case the entries of the fields
+\key{name}, \key{sort}, \key{alt} and \key{altsort} will be expanded during the
+process. You should keep that in mind if some error arises. It might be due to
+a \cmd{textbf} or similar in your database. In this case you either need to
+replace it with some robust command or put a \cmd{noexpand} in front of it.
+
+Alternative names as specified in the \key{alt} also get an index entry with a
+reference to the one of the corresponding \key{name} field. The entry of the
+\key{name} field in this case gets the \key{alt} name appended in braces.
+
+This behaviour is not customizable for the time being. It is planned for future
+versions of this package, though.
+
+As a demonstration an index for all chemicals used in this documentation is
+created with the help of the package \paket{imakeidx}.
+
+\subsection{Formatting Commands}
+The index entries are formatted with the following commands. You can redefine
+them to your needs. If you do make sure they have the same number of required
+arguments and are expandable!
+\begin{beschreibung}\makeatletter
+ \Befehl{SubstanceIndexNameEntry}\code{\#1\#2}\ma{\#1@\#2} \cnpkgdocarrow\
+   Formats the name if no \key{alt} field is given. \code{\#1} refers to the
+   \key{sort} field entry and \code{\#2} refers to the \key{name} field entry.
+ \Befehl{SubstanceIndexNameAltEntry}\code{\#1\#2\#3}\ma{\#1@\#2 (\#3)}
+   \cnpkgdocarrow\ Formats the name if also the \key{alt} field is given.
+   \code{\#1} refers to the \key{sort} field entry, \code{\#2} refers to the
+   \key{name} field entry, and \code{\#3} to the \key{alt} field entry.
+ \Befehl{SubstanceIndexAltEntry}\code{\#1\#2\#3}\ma{\#1@\#3|see\#2} \cnpkgdocarrow\
+   Formats the entry for the \key{alt} field. \code{\#1} refers to the \key{altsort}
+   field entry, \code{\#2} refers to the \key{name} field entry, and \code{\#3}
+   to the \key{alt} field entry.
+\end{beschreibung}
+
+\subsection{Using makeidx}
+Using the option \key{index}{true} with the standard way to create an index will
+add the entries \cmd{index}{<name>} to the index. This means you would mix them
+with other entries if you have any. Below a sample document is shown that needs
+to be compiled with \code{pdflatex}, \code{makeindex} and again with \code{pdflatex}.
+\begin{beispiel}[code only]
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[index]{substances}
+\LoadSubstances{substances-examples}
+
+\usepackage{makeidx}
+\makeindex
+\begin{document}
+
+\newcounter{substances}
+\ForAllSubstancesDo{%
+  \ifnum0=\value{substances}\relax
+  \else, \fi
+  \stepcounter{substances}\chem{#1}}
+
+\printindex
+\end{document}
+\end{beispiel}
+
+\subsection{Using splitidx}
+Maybe a seperate index for the chemicals will make more sense. In this case you
+could use the package \paket{splitidx}. \substances will recognize this and
+create \cmd{sindex}[\cmd{jobname}-chem]{<name>} entries each time \cmd{chem} is
+used. The sample document below needs to be compiled with \code{pdflatex},
+\code{splitindex} and again with \code{pdflatex}.
+\begin{beispiel}[code only]
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[index]{substances}
+\LoadSubstances{substances-examples}
+
+\usepackage{splitidx}
+\makeindex
+\newindex[Chemicals]{\jobname-chem}
+\begin{document}
+
+\newcounter{substances}
+\ForAllSubstancesDo{%
+  \ifnum0=\value{substances}\relax
+  \else, \fi
+  \stepcounter{substances}\chem{#1}}
+
+\printindex[\jobname-chem]
+\end{document}
+\end{beispiel}
+
+\subsection{Using imakeidx}
+Another way to create multiple indexes is the package \paket{imakeidx}. \substances
+recognizes its usage and creates index entries \cmd{index}[\cmd{jobname}-chem]{<name>}.
+The sample document below needs to be compiled with \code{pdflatex --shell-escape}.
+\begin{beispiel}[code only]
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[index]{substances}
+\LoadSubstances{substances-examples}
+
+\usepackage{imakeidx}
+\makeindex[name=\jobname-chem,title=Chemicals]
+\begin{document}
+
+\newcounter{substances}
+\ForAllSubstancesDo{%
+  \ifnum0=\value{substances}\relax
+  \else, \fi
+  \stepcounter{substances}\chem{#1}}
+
+\printindex[\jobname-chem]
+\end{document}
+\end{beispiel}
 
 \section{The Example Database}\label{sec:examples}
-The following code shows the example database that is part of this package.
+The following code shows the example database \code{substances-examples.sub}
+that is part of this package.
 
 \lstinputlisting[basicstyle=\ttfamily\footnotesize]{substances-examples.sub}
 

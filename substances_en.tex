@@ -31,6 +31,12 @@
 % If you have any ideas, questions, suggestions or bugs to report, please
 % feel free to contact me.
 % --------------------------------------------------------------------------
+%
+% if you want to compile this documentation you'll need the document class
+% `cnpkgdoc' which you can get here:
+%    https://bitbucket.org/cgnieder/cnpkgdoc/
+% the class is licensed LPPL 1.3 or later
+%
 \documentclass[DIV10,toc=index,toc=bib]{cnpkgdoc}
 \docsetup{
   pkg = {[index]substances} ,
@@ -109,7 +115,7 @@
 \renewcommand*\partformat{%
   \textcolor{main}{\partname~\thepart\autodot}}
 \usepackage{fnpct}
-\usepackage[biblatex]{embrac}[2012/06/29]
+\usepackage{embrac}[2012/06/29]% option biblatex, falls Bibliography dazu kommt
 \ChangeEmph{[}[,.02em]{]}[.055em,-.08em]
 \ChangeEmph{(}[-.01em,.04em]{)}[.04em,-.05em]
 
@@ -122,7 +128,7 @@
   Labelling of Chemicals,}
 
 % bibliography:
-\usepackage[style=alphabetic,backend=biber]{biblatex}
+% \usepackage[style=alphabetic,backend=biber]{biblatex}
 
 % index:
 \usepackage{imakeidx,filecontents}
@@ -566,7 +572,7 @@ used. The sample document below needs to be compiled with \code{pdflatex},
 \subsection{Using imakeidx}
 Another way to create multiple indexes is the package \paket{imakeidx}. \substances
 recognizes its usage and creates index entries \cmd{index}[\cmd{jobname}-chem]{<name>}.
-The sample document below needs to be compiled with \code{pdflatex --shell-escape}.
+The sample document below needs to be compiled with \code{pdflatex -{}-shell-escape}.
 \begin{beispiel}[code only]
 \documentclass{article}
 \usepackage[T1]{fontenc}

@@ -32,8 +32,8 @@
 \RequirePackage{ expl3 , xparse , l3keys2e , xtemplate , chemmacros }
 \ProvidesExplPackage
   {substances}
-  {2012/07/22}
-  {0.1}
+  {2012/09/02}
+  {0.1a}
   {A Chemical Database}
 
 % ----------------------------------------------------------------------------
@@ -51,6 +51,9 @@
 \bool_new:N  \l_substances_imakeidx_bool
 \bool_new:N  \l_substances_multind_bool
 \bool_new:N  \l_substances_splitidx_bool
+\bool_new:N  \l_substances_single_name_bool
+\bool_new:N  \l_substances_single_alt_bool
+\bool_set_true:N \l_substances_single_alt_bool
 
 \tl_new:N    \l_substances_style_tl
 \tl_set:Nn   \l_substances_style_tl { default }
@@ -200,6 +203,7 @@
         \prop_put:NnV \l_substances_altsort_prop { #1 } \l_tmpa_tl
       }
     \bool_new:c { g_substances_#1_alt_index_entry_bool }
+    \bool_new:c { g_substances_#1_name_index_entry_bool }
   }
 
 \cs_new:Npn \substances_add_property:nnnn #1#2#3#4
@@ -330,8 +334,8 @@
   { \UseInstance { substances-index } { default } { #1 } }
 
 \cs_new:Npn \substances_remove_braces:xN #1#2
-  { \exp_last_unbraced:NNx \tl_set:Nn #2 { #1 } }
-\cs_generate_variant:Nn \exp_last_unbraced:NNo { NNx }
+  { \exp_args:NNNx \exp_last_unbraced:NNo \tl_set:Nn #2 { #1 } }
+\cs_generate_variant:Nn \exp_args:NNnx { NNN }
 
 \cs_new:Npn \substances_remove_str_x:nnnN #1#2#3#4
   {
@@ -364,21 +368,31 @@
         \prop_if_in_p:Nn \l_substances_alt_prop { #1 }
       }
       {
-        \substances_index:nx { \c_job_name_tl -chem }
+        \bool_if:cF { g_substances_#1_name_index_entry_bool }
           {
-            \SubstanceIndexNameAltEntry
-              { \prop_get:Nn \l_substances_sort_prop { #1 } }
-              { \GetSubstanceProperty { #1 } { name } }
-              { \GetSubstanceProperty { #1 } { alt } }
+            \substances_index:nx { \c_job_name_tl -chem }
+              {
+                \SubstanceIndexNameAltEntry
+                  { \prop_get:Nn \l_substances_sort_prop { #1 } }
+                  { \GetSubstanceProperty { #1 } { name } }
+                  { \GetSubstanceProperty { #1 } { alt } }
+              }
           }
+        \bool_if:NT \l_substances_single_name_bool
+          { \bool_gset_true:c { g_substances_#1_name_index_entry_bool } }
       }
       {
-        \substances_index:nx { \c_job_name_tl -chem }
+        \bool_if:cF { g_substances_#1_name_index_entry_bool }
           {
-            \SubstanceIndexNameEntry
-              { \prop_get:Nn \l_substances_sort_prop { #1 } }
-              { \GetSubstanceProperty { #1 } { name } }
+            \substances_index:nx { \c_job_name_tl -chem }
+              {
+                \SubstanceIndexNameEntry
+                  { \prop_get:Nn \l_substances_sort_prop { #1 } }
+                  { \GetSubstanceProperty { #1 } { name } }
+              }
           }
+        \bool_if:NT \l_substances_single_name_bool
+          { \bool_gset_true:c { g_substances_#1_name_index_entry_bool } }
       }
     \bool_if:nT
       {
@@ -396,7 +410,8 @@
                   { \GetSubstanceProperty { #1 } { name } }
                   { \GetSubstanceProperty { #1 } { alt } }
               }
-            \bool_gset_true:c { g_substances_#1_alt_index_entry_bool }
+            \substances_contains_see:NT \SubstanceIndexAltEntry
+              { \bool_gset_true:c { g_substances_#1_alt_index_entry_bool } }
           }
       }
   }
@@ -406,6 +421,13 @@
 \cs_new:Npn \SubstanceIndexNameEntry #1#2 { #1@#2 }
 \cs_new:Npn \SubstanceIndexNameAltEntry #1#2#3 { #1@#2~(#3) }
 \cs_new:Npn \SubstanceIndexAltEntry #1#2#3 { #1@#3|see{#2} }
+
+\cs_new:Npn \substances_contains_see:NT #1#2
+  {
+    \tl_set_rescan:Nnx \l_tmpa_tl {} {\cs_meaning:N #1 }
+    \tl_if_in:VnT \l_tmpa_tl { |see } { #2 }
+  }
+
 % ----------------------------------------------------------------------------
 % define some default fields:
 
@@ -439,4 +461,7 @@
 \tex_endinput:D
 
 % HISTORY:
-2012/07/22 v0.1 - first release to CTAN
+2012/07/22 v0.1  - first release to CTAN
+2012/09/02 v0.1a - small fix due to updated l3kernel
+
+% TODO:

@@ -244,7 +244,7 @@ should be in the same place as this documentation for example uses.}.
    \paket{chemmacros}' command \cmd{iupac}.
  \Option{sort}\optional If you plan to use the \key{index} option you
    should specify this field to get the sorting of the index right. This then
-   creates index entries \cmd{index}{<sort field>\@<name field>}.
+   creates index entries \makeatletter\cmd{index}{<sort field>@<name field>}\makeatother.
  \Option{alt}\optional An alternative name. The field's input is parsed with
    \paket{chemmacros}' command \cmd{iupac}.
  \Option{altsort}\optional This is the same as the \key{sort} field but for the

@@ -62,16 +62,16 @@
 \bool_set_true:N \l__substances_single_alt_bool
 
 \tl_new:N    \l__substances_style_tl
-\tl_set:Nn   \l__substances_style_tl { default }
+\tl_set:Nn   \l__substances_style_tl {default}
 
 \AtBeginDocument
   {
-    \@ifpackageloaded { imakeidx }
-      { \bool_set_true:N \l__substances_imakeidx_bool } {}
-    \@ifpackageloaded { splitidx }
-      { \bool_set_true:N \l__substances_splitidx_bool } {}
-    \@ifpackageloaded { multind }
-      { \bool_set_true:N \l__substances_multind_bool } {}
+    \@ifpackageloaded {imakeidx}
+      { \bool_set_true:N \l__substances_imakeidx_bool } { }
+    \@ifpackageloaded {splitidx}
+      { \bool_set_true:N \l__substances_splitidx_bool } { }
+    \@ifpackageloaded {multind}
+      { \bool_set_true:N \l__substances_multind_bool } { }
   }
 
 % ----------------------------------------------------------------------------
@@ -79,39 +79,39 @@
 \cs_new_protected:Npn \substances_msg:nnn #1#2#3
   {
     \bool_if:NTF \l__substances_strict_bool
-      { \msg_error:nnxx { substances } {#1} {#2} {#3} }
-      { \msg_warning:nnxx { substances } {#1} {#2} {#3} }
+      { \msg_error:nnnn {substances} {#1} {#2} {#3} }
+      { \msg_warning:nnnn {substances} {#1} {#2} {#3} }
   }
 
-\msg_new:nnnn { substances } { property-missing }
+\msg_new:nnnn {substances} {property-missing}
   { Property~`#2'~not~defined~for~substance~`#1'~\msg_line_context:. }
   {
     You~called~property~`#2'~for~substance~`#1'.~It~seems~though~that~you~
     haven't~defined~it,~yet.
   }
 
-\msg_new:nnnn { substances } { field-missing }
+\msg_new:nnnn {substances} {field-missing}
   { Property~`#2'~is~not~defined~\msg_line_context:. }
   {
     You~called~property~`#2'~for~substance~`#1'.~This~property~has~not~been~
     declared,~though.~Perhaps~you've~mispelled?
   }
 
-\msg_new:nnnn { substances } { database-missing }
+\msg_new:nnnn {substances} {database-missing}
   { I~can't~find~the~database~file~`#1'~\msg_line_context:. }
   {
     You~requested~the~database~file~`#1',~but~apparently~it~is~missing.~Maybe~
     you've~mispelled?
   }
 
-\msg_new:nnnn { substances } { required-field }
+\msg_new:nnnn {substances} {required-field}
   { The~field~`#1'~is~missing~for~substance~`#2'~\msg_line_context:. }
   {
     You~declared~the~the~substance~`#2'~but~forgot~to~add~the~required~
     property~`#1'.
   }
 
-\msg_new:nnnn { substances } { style-missing }
+\msg_new:nnnn {substances} {style-missing}
   { I~can't~find~the~file~`substances_#1.def'. }
   {
     You~specified~the~style~`#1'~which~means~you~want~me~to~load~the~file~
@@ -136,23 +136,19 @@
 % define new property fields:
 \cs_new_protected:Npn \substances_define_property_field:nnnn #1#2#3#4
   {
-    \IfBooleanT {#1}
+    \bool_if:nT {#1}
       { \seq_put_right:Nn \l__substances_required_seq {#2} }
     \prop_if_exist:cF { l__substances_#2_prop }
-     { \prop_new:c { l__substances_#2_prop } }
-    \IfNoValueTF {#3}
+      { \prop_new:c { l__substances_#2_prop } }
+    \tl_if_blank:nTF {#3}
       { \prop_put:Nnn \l__substances_properties_pre_prop {#2} { } }
-      {
-        \tl_if_blank:nTF {#3}
-          { \prop_put:Nnn \l__substances_properties_pre_prop {#2} { } }
-          { \prop_put:Nnn \l__substances_properties_pre_prop {#2} {#3} }
-      }
-    \IfNoValueTF {#4}
+      { \prop_put:Nnn \l__substances_properties_pre_prop {#2} {#3} }
+    \tl_if_blank:nTF {#4}
       { \prop_put:Nnn \l__substances_properties_post_prop {#2} { } }
       { \prop_put:Nnn \l__substances_properties_post_prop {#2} {#4} }
   }
 
-\NewDocumentCommand \DeclareSubstanceProperty { smoo }
+\NewDocumentCommand \DeclareSubstanceProperty { smO{}O{} }
   { \substances_define_property_field:nnnn {#1} {#2} {#3} {#4} }
 \@onlypreamble\DeclareSubstanceProperty
 
@@ -164,11 +160,11 @@
     \clist_put_right:Nn \l_substances_chemicals_clist {#1}
     \prop_map_inline:Nn \l__substances_properties_pre_prop
       {
-        \tl_set:Nn \l__substances_tmpa_tl { ##2 }
+        \tl_set:Nn \l__substances_tmpa_tl {##2}
         \prop_get:NnN \l__substances_properties_post_prop
-          { ##1 }
+          {##1}
           \l__substances_tmpb_tl
-        \substances_add_property:nnVV {#1} { ##1 }
+        \substances_add_property:nnVV {#1} {##1}
           \l__substances_tmpa_tl
           \l__substances_tmpb_tl
       }
@@ -178,7 +174,7 @@
         \group_begin:
           \bool_set_true:N \l__substances_strict_bool
           \prop_if_in:cnF { l__substances_##1_prop } {#1}
-            { \substances_msg:nnn { required-field } { ##1 } {#1} }
+            { \substances_msg:nnn {required-field} {##1} {#1} }
         \group_end:
       }
     \prop_if_in:NnTF \l__substances_sort_prop {#1}
@@ -243,9 +239,9 @@
       {
         \IfSubstancePropertyTF {#1} {#2}
           { \prop_get:cn { l__substances_#2_prop } {#1} }
-          { {??} \substances_msg:nnn { property-missing } {#1} {#2} }
+          { {??} \substances_msg:nnn {property-missing} {#1} {#2} }
       }
-      { {??} \substances_msg:nnn { field-missing } {#1} {#2} }
+      { {??} \substances_msg:nnn {field-missing} {#1} {#2} }
   }
 
 % ----------------------------------------------------------------------------

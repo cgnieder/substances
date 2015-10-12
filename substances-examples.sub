@@ -8,7 +8,7 @@
 % Web:    https://bitbucket.org/cgnieder/substances/
 % E-Mail: contact@mychemistry.eu
 % --------------------------------------------------------------------------
-% Copyright 2012 Clemens Niederberger
+% Copyright 2012--2015 Clemens Niederberger
 % 
 % This work may be distributed and/or modified under the
 % conditions of the LaTeX Project Public License, either version 1.3
@@ -32,9 +32,9 @@
 %
 % example database to the package `substances'
 %
-\DeclareChemIUPAC\normal{\textit{n}}
+\ProvideChemIUPAC\normal{\textit{n}}
 \DeclareSubstance{NaCl}{
-  name       = Sodium\|chloride ,
+  name       = Sodium|chloride ,
   sort       = Sodiumchloride ,
   formula    = NaCl ,
   CAS        = 7647-14-5,
@@ -46,7 +46,8 @@
 }
 
 \DeclareSubstance{HCl}{
-  name       = Hydro\|chloric Acid ,
+  name       = Hydro|chloric Acid ,
+  sort       = Hydrochloric Acid ,
   formula    = HCl ,
   CAS        = 7647-01-0 ,
   pictograms = {acid,exclam} ,
@@ -147,7 +148,7 @@
 \DeclareSubstance{butane}{
   name       = Butane ,
   sort       = Butane ,
-  alt        = \normal\-Butane ,
+  alt        = \normal-Butane ,
   altsort    = n-Butane ,
   formula    = C4H10 ,
   structure  = H-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-H ,
@@ -166,7 +167,7 @@
 \DeclareSubstance{pentane}{
   name       = Pentane ,
   sort       = Pentane ,
-  alt        = \normal\-Pentane ,
+  alt        = \normal-Pentane ,
   altsort    = n-Pentane ,
   formula    = C5H12 ,
   structure  = H-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-C(-[2]H)(-[6]H)-H ,
@@ -186,7 +187,7 @@
 \DeclareSubstance{hexane}{
   name       = Hexane ,
   sort       = Hexane ,
-  alt        = \normal\-Hexane ,
+  alt        = \normal-Hexane ,
   altsort    = n-Hexane ,
   formula    = C6H14 ,
   structure  = -[:30]-[:-30]-[:30]-[:-30]-[:30] ,
@@ -205,7 +206,7 @@
 \DeclareSubstance{heptane}{
   name       = Heptane ,
   sort       = Heptane ,
-  alt        = \normal\-Heptane ,
+  alt        = \normal-Heptane ,
   altsort    = n-Heptane ,
   formula    = C7H16 ,
   structure  = -[:30]-[:-30]-[:30]-[:-30]-[:30]-[:-30] ,
@@ -224,7 +225,7 @@
 \DeclareSubstance{octane}{
   name       = Octane ,
   sort       = Octane ,
-  alt        = \normal\-Octane ,
+  alt        = \normal-Octane ,
   altsort    = n-Octane ,
   formula    = C8H18 ,
   structure  = -[:30]-[:-30]-[:30]-[:-30]-[:30]-[:-30]-[:30] ,
@@ -243,7 +244,7 @@
 \DeclareSubstance{nonane}{
   name       = Nonane ,
   sort       = Nonane ,
-  alt        = \normal\-Nonane ,
+  alt        = \normal-Nonane ,
   altsort    = n-Nonane ,
   formula    = C9H20 ,
   structure  = -[:30]-[:-30]-[:30]-[:-30]-[:30]-[:-30]-[:30]-[:-30] ,
@@ -262,7 +263,7 @@
 \DeclareSubstance{decane}{
   name       = Decane ,
   sort       = Decane ,
-  alt        = \normal\-Decane ,
+  alt        = \normal-Decane ,
   altsort    = n-Decane ,
   formula    = C10H22 ,
   structure  = -[:30]-[:-30]-[:30]-[:-30]-[:30]-[:-30]-[:30]-[:-30]-[:30] ,

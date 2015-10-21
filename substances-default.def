@@ -30,52 +30,50 @@
 % feel free to contact me.
 % --------------------------------------------------------------------------
 % substances: default style
-\SubstancesStyle{default}
-\RequirePackage { chemfig , siunitx }
+\SubstancesStyle*{default}
+\RequirePackage {chemfig,siunitx}
 
 % ----------------------------------------------------------------------------
 % helper functions for the GHS properties:
 \cs_new_protected:Npn \substances_get_pics:n #1
   {
-    \int_zero:N \l_tmpa_int
-    \clist_map_inline:nn { #1 }
-      {
-        \int_incr:N \l_tmpa_int
-        \int_compare:nF { \l_tmpa_int = 1 } { ~ }
-        \ghspic{##1}
-      }
+    \seq_set_split:Nnn \l_tmpa_seq {,} {#1}
+    \seq_set_map:NNn \l_tmpa_seq \l_tmpa_seq { \ghspic {##1} }
+    \seq_use:Nn \l_tmpa_seq {~}
   }
 
 \cs_new_protected:Npn \substances_get_ghs:nn #1#2
   {
-    \int_zero:N \l_tmpa_int
-    \clist_map_inline:nn { #2 }
-      {
-        \int_incr:N \l_tmpa_int
-        \int_compare:nF { \l_tmpa_int = 1 }
-          { \bool_if:NT \l_ghsystem_hide_statement_bool { , } ~ }
-        \ghs{#1}{##1}
-      }
+    \seq_set_split:Nnn \l_tmpa_seq {,} {#2}
+    \seq_set_map:NNn \l_tmpa_seq \l_tmpa_seq { \ghs {#1} {##1} }
+    \seq_use:Nn \l_tmpa_seq
+      { \bool_if:NT \l__ghsystem_hide_statement_bool {,} ~ }
   }
 
+\NewDocumentCommand \ghspictograms {m}
+  { \substances_get_pics:n {#1} }
+
+\NewDocumentCommand \ghsstatements {mm}
+  { \substances_get_ghs:nn {#1} {#2} }
+
 % ----------------------------------------------------------------------------
-\DeclareSubstanceProperty  {formula}      [\ch]
-\DeclareSubstanceProperty  {structure}    [\chemfig]
-\DeclareSubstanceProperty  {mass}         [\SI][{\MolMass}]
-\DeclareSubstanceProperty  {bp}           [\SI][{\celsius}]
-\DeclareSubstanceProperty  {mp}           [\SI][{\celsius}]
-\DeclareSubstanceProperty  {density}      [\SI][{{\gram\per\cubic\centi\metre}}]
+\DeclareSubstanceProperty  {formula}    [\ch]
+\DeclareSubstanceProperty  {structure}  [\chemfig]
+\DeclareSubstanceProperty  {mass}       [\SI][{\MolMass}]
+\DeclareSubstanceProperty  {bp}         [\SI][{\celsius}]
+\DeclareSubstanceProperty  {mp}         [\SI][{\celsius}]
+\DeclareSubstanceProperty  {density}    [\SI][{{\gram\per\cubic\centi\metre}}]
 \DeclareSubstanceProperty  {phase}
-\DeclareSubstanceProperty  {pKa}          [\num]
-\DeclareSubstanceProperty  {pKa1}         [\num]
-\DeclareSubstanceProperty  {pKa2}         [\num]
-\DeclareSubstanceProperty  {pKb}          [\num]
-\DeclareSubstanceProperty  {pKb1}         [\num]
-\DeclareSubstanceProperty  {pKb2}         [\num]
-\DeclareSubstanceProperty  {pictograms}   [\substances_get_pics:n]
-\DeclareSubstanceProperty  {H}            [\substances_get_ghs:nn{H}]
-\DeclareSubstanceProperty  {P}            [\substances_get_ghs:nn{P}]
-\DeclareSubstanceProperty  {EUH}          [\substances_get_ghs:nn{EUH}]
-\DeclareSubstanceProperty  {LD50}         [\SI][{{\milli\gram\per\kilo\gram}}]
+\DeclareSubstanceProperty  {pKa}        [\num]
+\DeclareSubstanceProperty  {pKa1}       [\num]
+\DeclareSubstanceProperty  {pKa2}       [\num]
+\DeclareSubstanceProperty  {pKb}        [\num]
+\DeclareSubstanceProperty  {pKb1}       [\num]
+\DeclareSubstanceProperty  {pKb2}       [\num]
+\DeclareSubstanceProperty  {pictograms} [\ghspictograms]
+\DeclareSubstanceProperty  {H}          [\ghsstatements{H}]
+\DeclareSubstanceProperty  {P}          [\ghsstatements{P}]
+\DeclareSubstanceProperty  {EUH}        [\ghsstatements{EUH}]
+\DeclareSubstanceProperty  {LD50}       [\SI][{{\milli\gram\per\kilo\gram}}]
 
 \tex_endinput:D

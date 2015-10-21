@@ -48,7 +48,6 @@
 
 \setcnltx{
   package  = {substances},
-%   info     = {comprehensive support for typesetting chemistry documents},
   url      = http://www.mychemistry.eu/forums/forum/substances/ ,
   authors  = Clemens Niederberger ,
   email    = contact@mychemistry.eu ,
@@ -63,40 +62,32 @@
     @CAS, @EC,
     ac, AllSubstancesClist, AllSubstancesSequence, arraybackslash,
     bottomrule,
-    CAS, celsius, ch, chem, chemfig, chemsetup, cmc,
+    CAS, celsius, centi, ch, chem, chemfig, chemsetup, cmc, cubic,
     DeclareSubstance, DeclareSubstanceProperty,
     EC, endinput,
     ForAllSubstancesDo,
-    GetSubstanceProperty, gram,
+    GetSubstanceProperty, ghs, ghspic, ghspictograms, ghsstatements, gram,
     IfSubstanceExistF, IfSubstanceExistT, IfSubstanceExistTF,
-    IfSubstanceFieldF, IfSubstanceFieldT, IfSubstanceFieldTF,
-    IfSubstancePropertyF, IfSubstancePropertyT, IfSubstancePropertyTF, iupac,
+      IfSubstanceFieldF, IfSubstanceFieldT, IfSubstanceFieldTF,
+      IfSubstancePropertyF, IfSubstancePropertyT, IfSubstancePropertyTF,
+      iupac,
+    kilo,
     Lewis, LoadSubstances,
-    midrule, MolMass,
+    metre, midrule, milli, MolMass,
     NewDocumentCommand, newindex, normal, num,
     ProvideChemIUPAC,
     per, printindex,
     RetrieveSubstanceProperty,
     SI, sisetup, SubstanceIndexAltEntry, SubstanceIndexNameAltEntry,
-    SubstanceIndexNameEntry,
+      SubstanceIndexNameEntry, SubstancesDatabase, SubstancesStyle,
     toprule
-  }
+  } ,
+  index-setup = { level = \section , othercode = \small }
 }
 
-% % Layout:
-% \usepackage[osf]{libertine}
-% \cnpkgcolors{
-%   main   => cnpkgred ,
-%   key    => yellow!40!brown ,
-%   module => cnpkgblue ,
-%   link   => black!90
-% }
+\defbibheading{bibliography}{\section{References}}
+
 \usepackage{booktabs}
-% \renewcommand*\othersectionlevelsformat[3]{%
-%   \textcolor{main}{#3\autodot}\enskip}
-% \renewcommand*\partformat{%
-%   \textcolor{main}{\partname~\thepart\autodot}}
-% \usepackage{fnpct}
 
 \expandafter\def\csname libertine@figurestyle\endcsname{LF}
 \usepackage[libertine]{newtxmath}
@@ -107,85 +98,60 @@
 \ChangeEmph{(}[-.01em,.04em]{)}[.04em,-.05em]
 
 \usepackage{acro}
+\acsetup{short-format=\scshape}
 \DeclareAcronym{CAS}{
-  short = CAS ,
+  short = cas ,
   long = Chemical Abstract Service
 }
 \DeclareAcronym{EC}{
-  short = EC ,
+  short = ec ,
   long  = European Commission Number
 }
 \DeclareAcronym{LD50}{
-  short = LD50,
+  short = ld50 ,
   long  = Median Lethal Dose
 }
 \DeclareAcronym{IUPAC}{
-  short = IUPAC,
+  short = iupac ,
   long  = International Union of Pure and Applied Chemistry
 }
 \DeclareAcronym{ghs}{
-  short = GHS,
+  short = ghs ,
   long  = Globally Harmonized System of Classification and Labelling of
   Chemicals
 }
 
-% bibliography:
-% \usepackage[style=alphabetic,backend=biber]{biblatex}
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand \substancesdatabase {m}
+  { \__substances_database:n {#1} }
+\DeclareExpandableDocumentCommand \substancesstyle {m}
+  { \__substances_style:n {#1} }
+\ExplSyntaxOff
 
-% index:
-% \usepackage{imakeidx,filecontents}
-% \begin{filecontents*}{\jobname.ist}
-%  heading_prefix "{\\bfseries "
-%  heading_suffix "\\hfil}\\nopagebreak\n"
-%  headings_flag  1
-%  delim_0 "\\dotfill "
-%  delim_1 "\\dotfill "
-%  delim_2 "\\dotfill "
-%  delim_r "\\textendash"
-%  suffix_2p "\\nohyperpage{\\,f.}"
-%  suffix_3p "\\nohyperpage{\\,ff.}"
-% \end{filecontents*}
+\newidxcmd\substyle{\texttt{#1}}[ (\substances\ style)]
 
-% % \indexsetup{noclearpage}
-% \makeindex[options=-sl \jobname.ist,intoc,title=Package Index]
-% \makeindex[name=\jobname-chem,title=Index of Chemicals,intoc,columns=3]
-
-% % abstract:
-% \TitlePicture{\parbox{.7\linewidth}{%
-%   }}
-
-% \ExplSyntaxOn
-% \NewDocumentCommand \Default {g}
-%   {
-%     \hfill\llap
-%       {
-%         \IfNoValueTF { #1 }
-%           {(initially~empty)}
-%           {Default:~\code{#1}}
-%       }
-%     \newline
-%   }
-% \NewDocumentCommand \required {}
-%   { \hfill \llap { required } \newline }
-% \NewDocumentCommand \optional {}
-%   { \hfill \llap { optional } \newline }
-% \ExplSyntaxOff
 \begin{document}
+
+\part{Preliminaries}
 
 \section{Licence and Requirements}
 \license
 
-\substances\ loads and needs the following packages: \pkg{expl3},
-\pkg{xparse}, \pkg{xtemplate} and \pkg{l3keys2e}. It also needs the
-chemistry package \pkg{chemmacros}.
+\substances\ loads and needs the following packages:
+\pkg{expl3}~\cite{bnd:l3kernel}, \pkg{xparse}, \pkg{xtemplate} and
+\pkg{l3keys2e}~\cite{bnd:l3packages}. It also needs the chemistry packages
+\pkg{chemmacros}~\cite{pkg:chemmacros}, \pkg{chemfig}~\cite{pkg:chemfig} and
+\pkg{ghsystem}~\cite{pkg:ghsystem}.
 
 \section{About}
 The \substances\ package allows you to create a database like file that contains
 data of various chemicals. These data can be retrieved in the document. An index
 creation of the chemicals used in the document is directly supported.
 
-\section{Options}
-\substances\ has only a few options:
+\part{Package Description}
+
+\section{Options}\label{sec:options}
+The \substances\ package has a few options:
 \begin{options}
   \keybool{draft}\Default{false}
     If set to true all warnings will be errors.
@@ -194,12 +160,16 @@ creation of the chemicals used in the document is directly supported.
   \keybool{index}\Default{false}
     Add index entries when \cs{chem} is called, see section~\ref{sec:index}.
   \keyval{style}{style}\Default{default}
-    Load specific style, see section~\ref{ssec:styles}.
+    Load specific style, see sections~\ref{ssec:styles}
+    and~\ref{sec:default-style}.
   \keybool{strict}\Default{false}
     If set to true all warnings will be errors. This option overwrites any
     \option{draft} or \option{final} option that is passed on by the document
     class.
 \end{options}
+
+The most important option is \option{style}.  Details concerning this option
+are explaind in sections~\ref{ssec:styles} and~\ref{sec:default-style}.
 
 \section{The Database}
 \subsection{Declaring the Chemicals}
@@ -222,21 +192,24 @@ An entry could look like this:
   }
 \end{sourcecode}
 
-Such entries can either be declared in the document preamble or probably
-more useful in a file with the ending \code{.sub}. Such a file can be input in
-the document via
+Such\changedversion{0.2} entries can either be declared in the document
+preamble or probably more useful in a database file. Such a file can be input
+in the document via
 \begin{commands}
-  \command{LoadSubstances}[\marg{filename}]
-    Input the file \meta{filename} \emph{without} specifying the file ending.
+  \command{LoadSubstances}[\marg{database name}]
+    Input the database \meta{database name}.  The name of a database file must
+    follow the structure
+    \code{\substancesdatabase{\meta{database name}}}.
 \end{commands}
-Suppose you have the file \code{mysubstances.sub} then you input it in the
-document preamble via \cs{LoadSubstances}\Marg{mysubstances}.
+Suppose you have the file \code{\substancesdatabase{mydatabase}} then you
+input it in the document preamble via \cs{LoadSubstances}\Marg{mydatabase}.
 
 \subsection{Available Fields}
 \subsubsection{Always Defined Fields}
 Below all fields defined by \substances\ are listed\footnote{Look in the file
-\code{substances-examples.sub} which is part of this package and
-should be in the same place as this documentation for example uses.}.
+  \code{\substancesdatabase{substances-examples}} which is part of this
+  package and should be in the same place as this documentation for example
+  uses.}.
 \begin{options}
   \keyval{name}{name}\Default!
     The \acs{IUPAC} name of the substance. This is the only field that
@@ -267,9 +240,11 @@ The \option{CAS} field processes the number using the macro
 You're free to redefine it to your needs.
 
 \subsubsection{Style-dependend Fields}
-\substances\ defines the style `default' which is loaded if no other style has
-been specified. It defines the following additional fields and loads the
-packages \pkg{chemfig} and \pkg{siunitx}.
+\substances\ defines the style \substyle{default} (see also
+sections~\ref{sec:options}, \ref{ssec:styles}, and~\ref{sec:default-style})
+which is loaded if no other style has been specified. It defines the following
+additional fields and loads the packages \pkg{chemfig}~\cite{pkg:chemfig} and
+\pkg{siunitx}~\cite{pkg:siunitx}.
 \begin{options}
   \keyval{formula}{formula}
     The molecular formula of the substance. The field's input is parsed with
@@ -311,51 +286,53 @@ packages \pkg{chemfig} and \pkg{siunitx}.
     \pkg{siunitx} command \cs{num}.
   \keyval{pictograms}{csv list of pictograms}
     The \acs{ghs} pictograms. This field takes a list of pictogram names as
-    they're input into \pkg{ghsystems}' command \cs{ghspic}.
+    they're input into \pkg{ghsystem}'s command
+    \cs{ghspic}~\cite{pkg:ghsystem}.
   \keyval{H}{csv list of hazard statements}
     The H statements. This field takes a list of numbers as they're input into
-    \pkg{ghsystems}' command \cs{ghs}\Marg{h}\marg{number}.
+    \pkg{ghsystem}'s command \cs{ghs}\Marg{h}\marg{number}.
   \keyval{P}{csv list of precautionary statements}
     The P statements. This field takes a list of pictogram names as they're
-    input into \pkg{ghsystems}' command \cs{ghs}\Marg{p}\marg{number}.
+    input into \pkg{ghsystem}'s command \cs{ghs}\Marg{p}\marg{number}.
   \keyval{EUH}{csv list of EUH statements}
     The EUH statements. This field takes a list of pictogram names as they're
-    input into \pkg{ghsystems}' command \cs{ghs}\Marg{euh}\marg{number}.
+    input into \pkg{ghsystem}'s command \cs{ghs}\Marg{euh}\marg{number}.
   \keyval{LD50}{\acl{LD50}}
     The \ac{LD50} in \si{\milli\gram\per\kilo\gram}. The field's entry is
     input into the \pkg{siunitx} command \cs{SI} in the following way: \\
     \cs{SI}\marg{field}\Marg{\cs{milli}\cs{gram}\cs{per}\cs{kilo}\cs{gram}}.
 \end{options}
 
-\subsection{Define Custom Styles}\label{ssec:styles}
-\subsubsection{Background}
+\section{Define Custom Styles}\label{ssec:styles}
+\subsection{Background}
 You might have other needs for fields than the ones defined by \substances\
-and the `default' style.  \emph{All} fields except the required \option{name}
-field are defined by the `default' style.
+and the \substyle{default} style.  \emph{All fields except the required
+  \option{name} field whixh are explained in this manual are defined by the
+  \substyle{default} style.}
 
 You can easily define your own style which means that you save a file with the
-name \code{substances-\meta{style}.def}. In it you both define the commands
+name \code{\substancesstyle{\meta{style}}}. In it you both define the commands
 you need and you declare substance properties with the command
-\cs{DeclareSubstanceProperty} which is explained in the next section, to
-declare your own fields.
+\cs{DeclareSubstanceProperty} (which is explained in
+section~\ref{sec:declare-new-fields}) to declare your own fields.
 
-% Please be aware that this style file is loaded by the package when the expl3
-% namespace is active. This means that all spaces are ignored and you need to
-% use \code{\textasciitilde} if you need a space. It also means that \code{\_}
-% and \code{:} are letters (as is \code{{\makeatletter @}}). Should you ever
-% decide to call \cs{ExplSyntaxOff} to turn off the expl3 namespace \emph{don't}
-% forget to use \cs{ExplSyntaxOn} at the end of the file!
-
-Such a style file typically should start with a declaration as follows:
+Such a style file should start with a \cs{SubstancesStyle} declaration:
 \begin{commands}
   \command{SubstancesStyle}[\sarg\marg{style name}]
-    This declares the style \meta{style name}. This also switches to the expl3
-    programming environment.  The starred version doesn't switch to the expl3
-    programming environment.  Either way \code{@} has category code~11 in a
-    style file.
+    This\sinceversion{0.2} declares the style \meta{style name}. The starred
+    version also switches to the expl3 programming environment.  Either way
+    \code{@} has category code~11 in a style file.
+  \command{LoadSubstancesStyle}[\marg{style name}]
+    This\sinceversion{0.2} loads the style \meta{style name}. It can be used
+    inside of a style file.  This can be useful if you want to extend the
+    default style without copy-pasting every definition of the default style.
+    Outside of a style file this command does nothing.
 \end{commands}
 
-\subsubsection{Declare New Fields or Change Existing Fields}
+The implementation of the \substyle{default} style is shown in
+section~\ref{sec:default-style} as an example.
+
+\subsection{Declare New Fields or Change Existing Fields}\label{sec:declare-new-fields}
 You might want other fields or change the definition of the predefined ones.
 For this there's
 \begin{commands}
@@ -436,7 +413,7 @@ The following code creates table~\ref{tab:methane}.
         formula           & \chem{methane}[formula] \\
                           & \chem{methane}[structure] \\
       \midrule
-        CAS               & \chem{methane}[CAS] \\
+        \ac{CAS}          & \chem{methane}[CAS] \\
         PubChem           & \chem{methane}[PubChem] \\
       \midrule
         boiling point     & \chem{methane}[bp] \\
@@ -543,7 +520,7 @@ This behaviour is not customizable for the time being. It is planned for future
 versions of this package, though.
 
 As a demonstration an index for all chemicals used in this documentation is
-created with the help of the package \pkg{imakeidx}.
+created with the help of the package \pkg{imakeidx}~\cite{pkg:imakeidx}.
 
 \subsection{Formatting Commands}
 The index entries are formatted with the following commands. You can redefine
@@ -588,10 +565,10 @@ mix them with other entries if you have any. Below a sample document is shown.
 \end{sourcecode}
 
 \subsection{Using \pkg*{splitidx}}
-Maybe a seperate index for the chemicals will make more sense. In this case you
-could use the package \pkg{splitidx}. \substances\ will recognize this and
-create \cs{sindex}\Oarg{\cs*{jobname}-chem}\marg{name} entries each time \cs{chem} is
-used.
+Maybe a seperate index for the chemicals will make more sense. In this case
+you could use the package \pkg{splitidx}~\cite{pkg:splitidx}. \substances\
+will recognize this and create \cs{sindex}\Oarg{\cs*{jobname}-chem}\marg{name}
+entries each time \cs{chem} is used.
 
 \begin{sourcecode}
   \documentclass{article}
@@ -617,8 +594,8 @@ used.
 
 \subsection{Using \pkg*{imakeidx}}
 Another way to create multiple indexes is the package
-\pkg{imakeidx}. \substances\ recognizes its usage and creates index entries
-\cs{index}\Oarg{\cs*{jobname}-chem}\marg{name}.
+\pkg{imakeidx}~\cite{pkg:imakeidx}. \substances\ recognizes its usage and
+creates index entries \cs{index}\Oarg{\cs*{jobname}-chem}\marg{name}.
 
 \begin{sourcecode}
   \documentclass{article}
@@ -641,13 +618,22 @@ Another way to create multiple indexes is the package
   \end{document}
 \end{sourcecode}
 
-\section{The Example Database}\label{sec:examples}
-The following code shows the example database \code{substances-examples.sub}
-that is part of this package.
-
-\implementation[basicstyle=\ttfamily\footnotesize]{substances-examples.sub}
-
+\part{Appendix}
 \appendix
+
+\section{The Default Style}\label{sec:default-style}
+The following code shows the contents of the file
+\code{\substancesstyle{default}} which defines the \substyle{default} style
+which is part of this package.
+
+\implementation[basicstyle=\ttfamily\footnotesize]{\substancesstyle{default}}
+
+\section{The Example Database}\label{sec:examples}
+The following code shows the example database
+\code{\substancesdatabase{substances-examples}} that is part of this package.
+
+\implementation[basicstyle=\ttfamily\footnotesize]{\substancesdatabase{substances-examples}}
+
 \printindex[\jobname-chem]
 
 \end{document}

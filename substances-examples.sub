@@ -32,6 +32,8 @@
 %
 % example database to the package `substances'
 %
+\SubstancesDatabase{substances-example}
+
 \ProvideChemIUPAC\normal{\textit{n}}
 \DeclareSubstance{NaCl}{
   name       = Sodium|chloride ,

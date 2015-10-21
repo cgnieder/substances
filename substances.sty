@@ -32,7 +32,7 @@
 \RequirePackage{ expl3 , xparse , l3keys2e , xtemplate }
 \ProvidesExplPackage
   {substances}
-  {2015/09/28}
+  {2015/10/21}
   {0.2}
   {A Chemical Database}
 
@@ -83,6 +83,13 @@
       { \msg_warning:nnnn {substances} {#1} {#2} {#3} }
   }
 
+\cs_new_protected:Npn \substances_msg:nn #1#2
+  {
+    \bool_if:NTF \l__substances_strict_bool
+      { \msg_error:nnn {substances} {#1} {#2} }
+      { \msg_warning:nnn {substances} {#1} {#2} }
+  }
+
 \msg_new:nnnn {substances} {property-missing}
   { Property~`#2'~not~defined~for~substance~`#1'~\msg_line_context:. }
   {
@@ -98,10 +105,13 @@
   }
 
 \msg_new:nnnn {substances} {database-missing}
-  { I~can't~find~the~database~file~`#1'~\msg_line_context:. }
   {
-    You~requested~the~database~file~`#1',~but~apparently~it~is~missing.~Maybe~
-    you've~mispelled?
+    I~ can't~ find~ the~ database~ file~ `\__substances_database:n{#1}'~
+    \msg_line_context: .
+  }
+  {
+    You~ requested~ the~ database~ file~ `\__substances_database:n{#1}',~ but~
+    apparently~ it~ is~ missing.~ Maybe~ you've~ mispelled?
   }
 
 \msg_new:nnnn {substances} {required-field}
@@ -458,9 +468,11 @@
 
 % ----------------------------------------------------------------------------
 % load style file
-
 \tl_const:Nn \c__substances_style_extension_tl {def}
-\tl_const:Nn \c__substances_style_prefix_tl    {substances}
+\tl_const:Nn \c__substances_style_prefix_tl    {substances-}
+
+\cs_new:Npn \__substances_style:n #1
+  { \c__substances_style_prefix_tl#1.\c__substances_style_extension_tl }
 
 \cs_new_protected:Npn \substances_load_style:n #1
   {
@@ -475,49 +487,101 @@
       {
 %        \msg_log:nnn {substances} {loading-style} {#1}
         \@onefilewithoptions
-          {\c__substances_style_prefix_tl-#1}[][]
+          {\c__substances_style_prefix_tl#1}[][]
           \c__substances_style_extension_tl
       }
-      { \substances_msg:nnn {style-missing} {#1} { } }
+      { \substances_msg:nn {style-missing} {#1} }
   }
 \cs_generate_variant:Nn \__substances_load_style:n { V }
 
 \prg_new_conditional:Npnn \substances_if_style_exist:n #1 {T,F,TF}
-   {
-     \file_if_exist:nTF
-       {\c__substances_style_prefix_tl-#1.\c__substances_style_extension_tl}
-       { \prg_return_true: }
-       { \prg_return_false: }
-   }
+  {
+    \file_if_exist:nTF
+      { \__substances_style:n {#1} }
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
 
 \cs_new_protected:Npn \__substances_style:nn #1#2
   {
-    % \seq_put_right:Nn \l__substances_loaded_styles_seq {#1}
-    % \prop_put:Nn \l__substances_loaded_styles_prop {#1} {#2}
-    \ProvidesFile
-      {\c__substances_style_prefix_tl-#2.\c__substances_style_extension_tl}
-    \bool_if:nF {#1} { \ExplSyntaxOn }
+    \ProvidesFile { \__substances_style:n {#2} }
+    \bool_if:nT {#1} { \ExplSyntaxOn }
+  }
+
+\bool_new:N \l__substances_inside_style_file_bool
+
+\NewDocumentCommand \SubstancesStyle {sm}
+  {
+    \__substances_style:nn {#1} {#2}
+    \bool_set_true:N \l__substances_inside_style_file_bool
+    \AtEndOfPackage
+      { \bool_set_false:N \l__substances_inside_style_file_bool }
+  }
+
+\NewDocumentCommand \LoadSubstancesStyle {m}
+  {
+    \bool_if:NTF \l__substances_inside_style_file_bool
+      { \substances_load_style:n {#1} }
+      {}
   }
   
-\NewDocumentCommand \SubstancesStyle {sm}
-  { \__substances_style:nn {#1} {#2} }
-
 \substances_load_style:V \l__substances_style_tl
 
-\NewDocumentCommand \LoadSubstances { m }
+% ----------------------------------------------------------------------------
+% load database file
+\tl_const:Nn \c__substances_database_extension_tl {sub}
+\tl_const:Nn \c__substances_database_prefix_tl    {}
+
+\cs_new:Npn \__substances_database:n #1
+  { \c__substances_database_prefix_tl#1.\c__substances_database_extension_tl }
+
+\prg_new_conditional:Npnn \substances_if_database_exist:n #1 {T,F,TF}
   {
-    \file_if_exist:nTF {#1.sub}
-      { \file_input:n {#1.sub} }
-      { \substances_msg:nnn {database-missing} {#1.sub} { } }
+    \file_if_exist:nTF
+      { \__substances_database:n {#1} }
+      { \prg_return_true: }
+      { \prg_return_false: }
   }
+
+\cs_new_protected:Npn \__substances_load_database:n #1
+  {
+    \substances_if_database_exist:nTF {#1}
+      {
+        \@onefilewithoptions
+          {\c__substances_database_prefix_tl#1}[][]
+          \c__substances_database_extension_tl
+      }
+      { \substances_msg:nn {database-missing} {#1} }
+  }
+\cs_generate_variant:Nn \__substances_load_database:n { V }
+
+\cs_new_protected:Npn \substances_load_database:n #1
+  {
+    \tl_set:Nx \l__substances_tmpa_tl { \tl_trim_spaces:n {#1} }
+    \__substances_load_database:V \l__substances_tmpa_tl
+  }
+
+\NewDocumentCommand \LoadSubstances {m}
+  { \substances_load_database:n {#1} }
 \@onlypreamble\LoadSubstances
+
+\cs_new_protected:Npn \__substances_database:nn #1#2
+  {
+    \ProvidesFile { \__substances_database:n {#2} }
+    \bool_if:nF {#1} { }
+  }
+  
+\NewDocumentCommand \SubstancesDatabase {sm}
+  { \__substances_database:nn {#1} {#2} }
 
 \tex_endinput:D
 
+% ----------------------------------------------------------------------------
 % HISTORY:
 2012/07/22 v0.1  - first release to CTAN
 2012/09/02 v0.1a - small fix due to updated l3kernel
-2015/09/28 v0.2  - maintenance: minor fixes, adapt to chemmacros v5
+2015/10/21 v0.2  - maintenance: minor fixes, adapt to chemmacros v5
                  - change implementation of how style files are loaded
+                 - change implementation of how database files are loaded
 
 % TODO:

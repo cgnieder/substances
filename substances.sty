@@ -190,7 +190,7 @@
     \prop_if_in:NnTF \l__substances_sort_prop {#1}
       {
         \substances_remove_braces_set:xN
-          { \prop_get:Nn \l__substances_sort_prop {#1} }
+          { \prop_item:Nn \l__substances_sort_prop {#1} }
           \l__substances_tmpa_tl
       }
       {
@@ -209,7 +209,7 @@
         \prop_if_in:NnTF \l__substances_altsort_prop {#1}
           {
             \substances_remove_braces_set:xN
-              { \prop_get:Nn \l__substances_altsort_prop {#1} }
+              { \prop_item:Nn \l__substances_altsort_prop {#1} }
               \l__substances_tmpa_tl
           }
           {
@@ -248,7 +248,7 @@
     \IfSubstanceFieldTF {#2}
       {
         \IfSubstancePropertyTF {#1} {#2}
-          { \prop_get:cn { l__substances_#2_prop } {#1} }
+          { \prop_item:cn { l__substances_#2_prop } {#1} }
           { {??} \substances_msg:nnn {property-missing} {#1} {#2} }
       }
       { {??} \substances_msg:nnn {field-missing} {#1} {#2} }
@@ -365,7 +365,7 @@
 
 \cs_new_protected:Npn \substances_remove_str_unbrace_set:nnnN #1#2#3#4
   {
-    \tl_set:Nx #4 { \prop_get:cn { l__substances_#3_prop } {#2} }
+    \tl_set:Nx #4 { \prop_item:cn { l__substances_#3_prop } {#2} }
     \tl_remove_all:Nn #4 {#1}
     \substances_remove_braces_set:xN {#4} #4
   }
@@ -398,7 +398,7 @@
             \substances_index:nx { \c_job_name_tl -chem }
               {
                 \SubstanceIndexNameAltEntry
-                  { \prop_get:Nn \l__substances_sort_prop {#1} }
+                  { \prop_item:Nn \l__substances_sort_prop {#1} }
                   { \GetSubstanceProperty {#1} {name} }
                   { \GetSubstanceProperty {#1} {alt} }
               }
@@ -412,7 +412,7 @@
             \substances_index:nx { \c_job_name_tl -chem }
               {
                 \SubstanceIndexNameEntry
-                  { \prop_get:Nn \l__substances_sort_prop {#1} }
+                  { \prop_item:Nn \l__substances_sort_prop {#1} }
                   { \GetSubstanceProperty {#1} {name} }
               }
           }
@@ -431,7 +431,7 @@
             \substances_index:nx { \c_job_name_tl -chem }
               {
                 \SubstanceIndexAltEntry
-                  { \prop_get:Nn \l__substances_altsort_prop {#1} }
+                  { \prop_item:Nn \l__substances_altsort_prop {#1} }
                   { \GetSubstanceProperty {#1} {name} }
                   { \GetSubstanceProperty {#1} {alt} }
               }

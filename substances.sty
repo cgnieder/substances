@@ -397,7 +397,7 @@
       {
         \bool_if:cF { g_substances_#1_name_index_entry_bool }
           {
-            \substances_index:nx { \c_job_name_tl -chem }
+            \substances_index:nx { \c_sys_jobname_str -chem }
               {
                 \SubstanceIndexNameAltEntry
                   { \prop_item:Nn \l__substances_sort_prop {#1} }
@@ -411,7 +411,7 @@
       {
         \bool_if:cF { g_substances_#1_name_index_entry_bool }
           {
-            \substances_index:nx { \c_job_name_tl -chem }
+            \substances_index:nx { \c_sys_jobname_str -chem }
               {
                 \SubstanceIndexNameEntry
                   { \prop_item:Nn \l__substances_sort_prop {#1} }
@@ -430,7 +430,7 @@
       {
         \bool_if:cF { g_substances_#1_alt_index_entry_bool }
           {
-            \substances_index:nx { \c_job_name_tl -chem }
+            \substances_index:nx { \c_sys_jobname_str -chem }
               {
                 \SubstanceIndexAltEntry
                   { \prop_item:Nn \l__substances_altsort_prop {#1} }
